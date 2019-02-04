@@ -3,6 +3,8 @@ Rocket flight simulations and GN&amp;C using cold gas thrusters.
 
 I will upload my work here as I complete it. Descriptions of files will also be put here when I upload them.
 
+Initial code adapted from a project I did last year modeling a water bottle rocket in flight
+
 
 Main: the main differential function that feeds into the ode45
 
