@@ -7,53 +7,47 @@
 %Start Date: 2/1/2019
 %Last edit: 2/3/2019
 
-
-
-%starting conditions
-global m_rf %rocket fuselage mass
-global g %gravity
-
-%thrust variables
-global V_e %Exit velocity of propellant for thrust calculations
-global p_e %Exit pressure of propellant for thrust calculations
-global A_e %Exit area of propellant
-global p_0 %Atmospheric Pressure
-
-%drag variables
-global C_d %Drag Coefficient
-global rho %atmospheric density
-global A_c % cross-sectional area (top down)
-
-
+clear;clc;
 
 %Using V-2 specs and some arbitrary numbers
-m_rf = 2000; %kg
-g = 9.81; %m/s^2
-V_e = 2200; %m/s
-p_e = 2000000; %Pa
-A_e = .7366; %m
-p_0 = 101325; %Pa
-C_d = .3;
-rho = 1.225; %kg/m^3
-A_c = 1.65; %m
+var.m_rf = 2000; %kg
+var.g = 9.81; %m/s^2
+var.V_e = 2200; %m/s
+var.p_e = 2000000; %Pa
+var.A_e = .7366; %m
+var.p_0 = 101325; %Pa
+var.C_d = .3;
+var.rho = 1.225; %kg/m^3
+var.A_c = 1.65; %m
+var.h = [0,0.9,1];
+var.mfi = 10000;
 
-massflow = 749*A_e*V_e; %density of kerosene = 749 kg/m^3
+massflow = var.A_e*var.V_e; %density of kerosene = 749 kg/m^3
 
 
 
 
-init = [10000,0,0]; %fuel mass, initial speed, initial height
-tspan = (0:0.005:78.5);
-[t,y] = ode45(@(t,y) Main(t,y,massflow),tspan,init);
+init = [var.mfi,0,0,0,0,0,0]; %fuel mass, initial speed, initial height
+tspan = (0:0.005:200);
+[t,y] = ode45(@(t,y) Main3D(t,y,massflow,var),tspan,init);
 
-V = y(:,2);
-h = y(:,3);
+m = y(:,1);
+V = y(:,2:4);
+r = y(:,5:7);
 
-plot(t,h)
-xlabel("t (s)")
-ylabel("height (m?) (need to make sure all my units check out)")
+%plot(t,h)
+plot3(r(:,1),r(:,2),r(:,3))
+xlabel("x")
+ylabel("y")
+zlabel("z")
 
 figure
 plot(t,V)
+legend("x-vel","y-vel","z-vel")
 xlabel("t (s)")
 ylabel("V (m/s) (check units)")
+
+figure
+plot(t,m)
+xlabel("t (s)")
+ylabel("mass")
