@@ -22,14 +22,22 @@ var.A_c = 1.65; %m
 var.h = [0,0.9,1];
 var.mfi = 10000;
 
-massflow = var.A_e*var.V_e; %density of kerosene = 749 kg/m^3
+massflow = var.A_e*var.V_e;
 
 
 
 
-init = [var.mfi,0,0,0,0,0,0]; %fuel mass, initial speed, initial height
-tspan = (0:0.005:200);
-[t,y] = ode45(@(t,y) Main3D(t,y,massflow,var),tspan,init);
+y(1,:) = [var.mfi,0,0,0,0,0,0]; %fuel mass, initial speed, initial location
+dt = .5;
+t = (0:dt:50);
+f = @(t,y) Main3D(t,y,massflow,var);
+for i = 2:numel(t)
+    k1 = dt*f(t(i-1),y(i-1,:));
+    k2 = dt*f(t(i-1)+dt/2, y(i-1,:)+k1/2);
+    k3 = dt*f(t(i-1)+dt/2, y(i-1,:)+k2/2);
+    k4 = dt*f(t(i-1)+dt, y(i-1,:)+k3);
+    y(i,:) = y(i-1,:) + (k1'+2*k2'+2*k3'+k4')/6;
+end
 
 m = y(:,1);
 V = y(:,2:4);

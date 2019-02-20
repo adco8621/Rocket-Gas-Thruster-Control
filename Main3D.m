@@ -30,7 +30,7 @@ if m_fuel == var.mfi;
     T = T*h;
     
     %Drag (D), velocity (V)
-    D = ((var.C_d*var.rho*V.^2*var.A_c)./2)';
+    D = ((var.C_d*var.rho*V.^2*var.A_c)./2);
     
     m_r = var.m_rf + m_fuel;
 
@@ -84,7 +84,7 @@ end
 dV_dt = (F./m_r)';
 
 %Location change components
-dr_dt = V;
+dr_dt = V';
 
 if r(3)<0
     r(3)=0;
