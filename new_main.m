@@ -5,12 +5,21 @@ v = y(5:7);
 
 normx = norm(x);
 
+
+
 if y(1) > var.m_dry
-   m = y(1);
-   mdot = -var.mdot;
-   T = var.T;
-   D = (var.cd*var.rho*(norm(v))^2*var.a)/2;
-   a = (-(var.grav/normx^3)*x) + (T*var.dir)/m-(D*var.dir)/m;
+   if y(1) == var.m_wet
+    m = y(1);
+    mdot = -var.mdot;
+    T = var.T;
+    a = (-(var.grav/normx^3)*x) + (T*var.dir)/m;
+   else
+    m = y(1);
+    mdot = -var.mdot;
+    T = var.T;
+    D = (var.cd*var.rho*(norm(v))^2*var.a)/2;
+    a = (-(var.grav/normx^3)*x) + (T*var.dir)/m-(D*(v/norm(v)))/m;
+   end
 elseif v == [0;0;0]
    m = var.m_dry;
    mdot = 0;
@@ -22,7 +31,7 @@ else
    mdot = 0;
    T = 0;
    D = (var.cd*var.rho*(norm(v))^2*var.a)/2;
-   a = (-(var.grav/normx^3)*x) + (T*var.dir)/m-(D*var.dir)/m;
+   a = (-(var.grav/normx^3)*x) + (T*var.dir)/m-(D*(v/norm(v)))/m;
 end
 
 dm = mdot;

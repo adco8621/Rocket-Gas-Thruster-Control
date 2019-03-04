@@ -4,7 +4,8 @@ var.m_e = 5.9723*10^24; %earth mass kg
 var.r_e = 6371000; %earth radius m
 var.G = 6.67408*10^-11; %G m^3 kg^-1 s^-2
 var.grav = var.m_e * var. G; %for gravity calculations
-var.dir = [0;0.1;1]; %assuming constant up direction
+var.dir = [0.1;0.5;1]; %assuming constant up direction
+var.dir = var.dir/norm(var.dir);
 var.cd = .3; %drag coefficient
 var.rho = 1.225; %air density kg m^-3
 
@@ -22,7 +23,7 @@ vini = [0;0;0];
 
 y(:,1) = [var.m_wet;xini;vini];
 dt = .5;
-t = (0:dt:1000);
+t = (0:dt:150);
 xdot = @(t,y) new_main(t,y,var);
 for i = 2:numel(t)
     if y(1,end)<var.m_dry
@@ -31,7 +32,6 @@ for i = 2:numel(t)
     if norm(y(2:4,i-1))<var.r_e
         y(5:7,i) = 0;
         y(5:7,i-1) = 0;
-        y(5:7,i-2) = 0;
     end
     k1 = dt*xdot(t(i-1),y(:,i-1));
     k2 = dt*xdot(t(i-1)+dt/2, y(:,i-1)+k1/2);
@@ -44,28 +44,36 @@ m = y(1,:);
 r = y(2:4,:);
 V = y(5:7,:);
 
-%plot(t,h)
+%plot(t,x)
 plot3(r(1,:),r(2,:),r(3,:)-var.r_e)
-xlabel("x")
-ylabel("y")
-zlabel("z")
+xlabel("x [m]")
+ylabel("y [m]")
+zlabel("z [m]")
+title("Rocket Trajectory")
+legend("Flight Path")
 grid
 
+%plot(t,vel)
 figure
 plot(t,V)
 legend("x-vel","y-vel","z-vel")
-xlabel("t (s)")
-ylabel("V (m/s) (check units)")
+xlabel("t [s]")
+ylabel("V [m/s]")
+title("Velocity Components")
 grid
 
+%plot(t,mass)
 figure
 plot(t,m)
-xlabel("t (s)")
-ylabel("mass")
+xlabel("t [s]")
+ylabel("mass [kg]")
+title("Rocket Mass")
 grid
 
+%plot(t,z)
 figure
 plot(t,r(3,:)-var.r_e)
-xlabel("t")
-ylabel("z")
+xlabel("t [s]")
+ylabel("z [m]")
+title("Rocket Height")
 grid
