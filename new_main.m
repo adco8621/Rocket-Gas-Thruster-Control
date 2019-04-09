@@ -1,43 +1,31 @@
 function dydt = new_main(t,y,var)
 
-x = y(2:4);
-v = y(5:7);
+m = y(1);
+x_inert = y(2:4);
+v_inert = y(5:7);
+sig = y(8:10);
+omeg = y(11:13);
 
-normx = norm(x);
-
-
-
-if y(1) > var.m_dry
-   if y(1) == var.m_wet
-    m = y(1);
-    mdot = -var.mdot;
-    T = var.T;
-    a = (-(var.grav/normx^3)*x) + (T*var.dir)/m;
-   else
-    m = y(1);
-    mdot = -var.mdot;
-    T = var.T;
-    D = (var.cd*var.rho*(norm(v))^2*var.a)/2;
-    a = (-(var.grav/normx^3)*x) + (T*var.dir)/m-(D*(v/norm(v)))/m;
-   end
-elseif v == [0;0;0]
-   m = var.m_dry;
-   mdot = 0;
-   T = 0;
-   D = 0;
-   a = [0;0;0];
+T = var.T;
+if v_inert ~= [0;0;0]
+    D = ((v_inert/norm(v_inert)) * ((var.cd * var.rho * norm(v_inert)^2 * var.a)/2));
 else
-   m = var.m_dry;
-   mdot = 0;
-   T = 0;
-   D = (var.cd*var.rho*(norm(v))^2*var.a)/2;
-   a = (-(var.grav/normx^3)*x) + (T*var.dir)/m-(D*(v/norm(v)))/m;
+    D = [0;0;0];
 end
 
-dm = mdot;
-dx = v;
-dv = a;
+normx = norm(x_inert);
 
-dydt = [dm;dx;dv];
+mdot = -var.mdot;
+a = ((MRP2DCM(sig).'*T)/m) + (-(var.grav/normx^3)*x_inert) - D/m;
+sigdot = (.25*((1-(sig.'*sig))*eye(3) + 2*skew(sig.') + (2*sig*(sig.'))))*omeg;
+odot = (-skew(omeg)*(var.Imat*omeg)) + var.Imat\(skew(var.COM)*T) + var.Imat\var.L;
+
+dm = mdot;
+dx = v_inert;
+dv = a;
+ds = sigdot;
+do = odot;
+
+dydt = [dm;dx;dv;ds;do];
 end
 
